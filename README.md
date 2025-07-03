@@ -9,6 +9,14 @@ This project provides a [Terraform](https://www.terraform.io/) configuration to 
 * [Civo](https://www.civo.com/) account with API key
 * [Terraform](https://www.terraform.io/) installed on your system
 * [Kubernetes](https://kubernetes.io/) client (e.g., [Lens](https://k8slens.dev/), [kubectl](https://kubernetes.io/docs/reference/kubectl/), [k9s](https://k9scli.io/) etc) for interacting with the cluster
+* [Bash](https://www.gnu.org/software/bash/) version 4.4 or higher installed on your system (required for the sync script)
+
+You can upgrade your Bash version on macOS using Homebrew:
+```bash
+brew install bash
+```
+
+This installation will typically place the new Bash binary in `/opt/homebrew/bin/bash`. You will need to specify this path in the `vars.tfvars` file.
 
 ## Infrastructure Setup
 
@@ -18,6 +26,7 @@ To set up and deploy the Kubernetes cluster, follow these steps:
 ```hcl
 civo_token = "your_civo_api_key"
 region     = "your_civo_region"  # Change to your preferred region. Default is "LON1".
+bash_path  = "your_bash_path"  # Change this to your preferred bash path. Default is "/opt/homebrew/bin/bash" (Installed with brew).
 ```
 Replace `"your_civo_api_key"` with your actual Civo API key.
 
@@ -36,11 +45,11 @@ terraform plan --var-file="vars.tfvars"
 terraform apply --var-file="vars.tfvars"
 ```
 
-5. Retrieve the kubeconfig from the Civo dashboard and load it into kubecontext.
+5. Retrieve the kubeconfig from the Civo dashboard and load it into your kubecontext.
 
-## Deploying DeployKF
+## ArgoCD (Optional)
 
-DeployKF is deployed through [ArgoCD](https://argo-cd.readthedocs.io/en/stable/), which is already installed on the cluster provisioned through Terraform. You can access the ArgoCD Web UI to see the DeployKF application being deployed. This is optional but recommended to see if anything goes wrong during the deployment.
+[DeployKF](https://www.deploykf.org/) is deployed through [ArgoCD](https://argo-cd.readthedocs.io/en/stable/), which is already installed on the cluster provisioned through Terraform. You can access the ArgoCD Web UI to see the DeployKF application being deployed. This is optional but recommended to see if anything goes wrong during the deployment.
 
 You can first expose the ArgoCD service by patching the service to use a LoadBalancer:
 
@@ -54,21 +63,19 @@ You can then access ArgoCD using the LoadBalancer IP address. The default userna
 echo $(kubectl -n argocd get secret/argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
 ```
 
-1. Apply the Kyverno configuration:
-```bash
-kubectl apply -f kyverno.yaml
-```
+## Accessing Kubeflow
 
-2. Apply the DeployKF configuration:
-```bash
-kubectl apply -f deploykf-values.yaml
-```
+The DeployKF dashboard is exposed through the LoadBalancer IP address of the `deploykf-gateway` service. This service is automatically created by DeployKF and will route traffic to the Kubeflow dashboard.
 
-After this step you should see a deploykf App of Apps application in the ArgoCD UI.
+**IMPORTANT NOTE:** You cannot access the Kubeflow dashboard using the LoadBalancer IP address directly. Instead, you need to set up a DNS record that points to the LoadBalancer IP address.
 
-3. Run the ArgoCD apps sync script:
+Add this to your ```/etc/hosts``` file for local testing:
+
 ```bash
-bash sync_argocd_apps.sh
+<LoadBalancer_IP> deploykf.example.com
+<LoadBalancer_IP> argo-server.deploykf.example.com
+<LoadBalancer_IP> minio-api.deploykf.example.com
+<LoadBalancer_IP> minio-console.deploykf.example.com
 ```
 
 ## Troubleshooting
@@ -78,7 +85,6 @@ bash sync_argocd_apps.sh
 ## Configuration Files
 
 * `vars.tfvars`: Contains the [Civo](https://www.civo.com/) API key and other variables for [Terraform](https://www.terraform.io/).
-* `kyverno.yaml`: Configuration for [Kyverno](https://kyverno.io/), a Kubernetes policy engine.
 * `deploykf-values.yaml`: Configuration for [DeployKF](https://www.deploykf.org/), a Kubernetes deployment tool.
 
 ## Contributing and Support

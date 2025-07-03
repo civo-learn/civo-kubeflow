@@ -6,7 +6,7 @@ resource "civo_kubernetes_cluster" "cluster" {
   network_id  = civo_network.network.id
 
   # Cluster type must be talos for GPU support
-  cluster_type = "talos"
+  cluster_type = "k3s"
 
   # attach one 
   pools {
@@ -54,13 +54,27 @@ resource "helm_release" "argo_cd" {
   ]
 }
 
-# Needed to combat the issues using deployKF on Talos
-resource "helm_release" "kyverno" {
-  depends_on       = [helm_release.argo_cd]
-  name             = "kyverno"
-  namespace        = "kyverno-labeller"
-  repository       = "https://kyverno.github.io/kyverno/"
-  chart            = "kyverno"
-  version          = "2.6.3"
-  create_namespace = true
+resource "helm_release" "deploy_kf" {
+  name  = "deploy-kf-app-of-apps"
+  chart = "helm/deployKF"
+
+  depends_on = [
+    helm_release.argo_cd
+  ]
+
+  timeout = "600"
+}
+
+resource "null_resource" "sync_deploy_kf" {
+  depends_on = [
+    helm_release.deploy_kf
+  ]
+
+  provisioner "local-exec" {
+    command     = "./sync_argocd_apps.sh"
+    interpreter = [var.bash_path, "-c"]
+    environment = {
+      KUBECONFIG = local_file.cluster-config.filename
+    }
+  }
 }

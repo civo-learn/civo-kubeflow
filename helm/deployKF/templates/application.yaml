@@ -34,7 +34,6 @@ spec:
         ##  - this parameter allows defining values without needing to create a file in the repo
         ##  - these values are merged with higher precedence than those defined in `values_files`
         ##
-        
         - name: "values"
           string: |
             ##

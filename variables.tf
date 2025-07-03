@@ -23,6 +23,12 @@ variable "cluster_node_count" {
   description = "The number of nodes to provision in the cluster"
 }
 
+variable "bash_path" {
+  description = "Path to the Bash binary >= 4.4"
+  type        = string
+  default     = "/opt/homebrew/bin/bash" # Change this to your preferred default
+}
+
 # # # # # # # # # # # 
 # Civo configuration # 
 # # # # # # # # # # # 
