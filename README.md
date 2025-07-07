@@ -10,13 +10,14 @@ This project provides a [Terraform](https://www.terraform.io/) configuration to 
 * [Terraform](https://www.terraform.io/) installed on your system
 * [Kubernetes](https://kubernetes.io/) client (e.g., [Lens](https://k8slens.dev/), [kubectl](https://kubernetes.io/docs/reference/kubectl/), [k9s](https://k9scli.io/) etc) for interacting with the cluster
 * [Bash](https://www.gnu.org/software/bash/) version 4.4 or higher installed on your system (required for the sync script)
+* [ArgoCD CLI](https://argo-cd.readthedocs.io/en/stable/cli_installation/) (optional, for managing DeployKF deployments)
 
 You can upgrade your Bash version on macOS using Homebrew:
 ```bash
 brew install bash
 ```
 
-This installation will typically place the new Bash binary in `/opt/homebrew/bin/bash`. You will need to specify this path in the `vars.tfvars` file.
+This installation will typically place the new Bash binary in `/opt/homebrew/bin/bash`. You will need to specify this path in the `terraform.tfvars` file.
 
 ## Infrastructure Setup
 
@@ -37,12 +38,12 @@ terraform init
 
 3. Plan the Terraform configuration:
 ```bash
-terraform plan --var-file="vars.tfvars"
+terraform plan"
 ```
 
 4. Apply the Terraform configuration:
 ```bash
-terraform apply --var-file="vars.tfvars"
+terraform apply"
 ```
 
 5. Retrieve the kubeconfig from the Civo dashboard and load it into your kubecontext.
