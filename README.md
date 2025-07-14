@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This project provides a [Terraform](https://www.terraform.io/) configuration to set up a [DeployKF](https://www.deploykf.org/) on a [Civo](https://www.civo.com/) Kubernetes cluster.
+This project provides a [Terraform](https://www.terraform.io/) configuration to set up a [DeployKF](https://www.deploykf.org/) on a k3s [Civo](https://www.civo.com/) Kubernetes cluster. 
 
 ## Prerequisites
 
@@ -23,7 +23,7 @@ This installation will typically place the new Bash binary in `/opt/homebrew/bin
 
 To set up and deploy the Kubernetes cluster, follow these steps:
 
-1. Create `vars.tfvars` from the template:
+1. Create `terraform.tfvars` from the template:
 ```hcl
 civo_token = "your_civo_api_key"
 region     = "your_civo_region"  # Change to your preferred region. Default is "LON1".
@@ -64,6 +64,7 @@ You can then access ArgoCD using the LoadBalancer IP address. The default userna
 echo $(kubectl -n argocd get secret/argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
 ```
 
+
 ## Accessing Kubeflow
 
 The DeployKF dashboard is exposed through the LoadBalancer IP address of the `deploykf-gateway` service. This service is automatically created by DeployKF and will route traffic to the Kubeflow dashboard.
@@ -79,13 +80,19 @@ Add this to your ```/etc/hosts``` file for local testing:
 <LoadBalancer_IP> minio-console.deploykf.example.com
 ```
 
+## Deploying to Production
+
+For a fully secure connection to the ArgoCD web UI and Kubeflow dashboard, we recommend configuring a custom TLS certificate using an Ingress resource. This ensures encrypted communication and verifies the identity of your application endpoints. 
+
+For additional resources, see [Cert Manager](https://cert-manager.io/docs/) and [Lets Encrypt](https://letsencrypt.org/) documentation.
+
 ## Troubleshooting
 
 * Common issues and their solutions will be documented here. For more information on troubleshooting [DeployKF](https://www.deploykf.org/docs/latest/troubleshooting/), please refer to the official documentation.
 
 ## Configuration Files
 
-* `vars.tfvars`: Contains the [Civo](https://www.civo.com/) API key and other variables for [Terraform](https://www.terraform.io/).
+* `terraform.tfvars`: Contains the [Civo](https://www.civo.com/) API key and other variables for [Terraform](https://www.terraform.io/).
 * `deploykf-values.yaml`: Configuration for [DeployKF](https://www.deploykf.org/), a Kubernetes deployment tool.
 
 ## Contributing and Support
