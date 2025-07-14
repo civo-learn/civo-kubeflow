@@ -38,12 +38,12 @@ terraform init
 
 3. Plan the Terraform configuration:
 ```bash
-terraform plan"
+terraform plan
 ```
 
 4. Apply the Terraform configuration:
 ```bash
-terraform apply"
+terraform apply
 ```
 
 5. Retrieve the kubeconfig from the Civo dashboard and load it into your kubecontext.
