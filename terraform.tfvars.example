@@ -1,2 +1,3 @@
-civo_token = "YOUR CIVO API TOKEN"
-region     = "YOUR CIVO REGION"
+civo_token = "your_civo_api_key"
+region     = "your_civo_region"  # Change to your preferred region. Default is "LON1".
+bash_path  = "your_bash_path"  # Change this to your preferred bash path. Default is "/opt/homebrew/bin/bash" (Installed with brew).
